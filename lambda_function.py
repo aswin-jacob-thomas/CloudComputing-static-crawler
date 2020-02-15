@@ -7,11 +7,12 @@ def lambda_handler(event, context):
     if (event["queryStringParameters"] is None) or  ("url" not in event["queryStringParameters"]):
         body = json.dumps({"Error":"Please pass the url of the website to crawl like url = www.google.com"})
     else:
-        url = event["queryStringParameters"]['url']
-        
+        url = str(event["queryStringParameters"]['url'])
+        if (not (url.startswith("http://") or url.startswith("https://"))):
+            url = "http://"+url
         resource = urllib.request.urlopen(url)
         contents =  resource.read()
-        url = url.replace("https://","").replace("https://","")
+        url = url.replace("https://","").replace("http://","")
         url = url.strip("/")
         s3 = boto3.resource('s3')
         bucket = 'staticwebpagesbucket'
